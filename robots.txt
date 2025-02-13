@@ -1,2 +1,4 @@
 User-agent: *
 Disallow: /testpage/
+Allow: /
+Sitemap: https://jyup.tokyo/sitemap.xml
