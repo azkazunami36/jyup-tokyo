@@ -1,9 +1,275 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>jyup</title>
-  </head>
-  <body>
-    <h1>テストページ</h1>
-  </body>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacOS Style Window</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0d1117;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #c9d1d9;
+        }
+
+        .window {
+            background: #161b22;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            width: 900px;
+            height: auto;
+            position: absolute;
+            transition: transform 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .window-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px 15px;
+            background: #20252c;
+            border-radius: 12px 12px 0 0;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .window-header .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .dot.red { background-color: #ff5f56; }
+        .dot.yellow { background-color: #ffbd2e; }
+        .dot.green { background-color: #27c93f; }
+
+        .stacks-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .stack-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #20252c;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            cursor: pointer;
+        }
+
+        .stack-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.8);
+        }
+
+        .stack-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 10px;
+        }
+
+        .stack-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #c9d1d9;
+        }
+
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: #161b22;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 0 10px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .bottom-bar-item {
+            width: 120px;
+            height: 30px;
+            background-color: #20252c;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            cursor: pointer;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+
+        .iframe-container {
+            flex-grow: 1;
+            border: none;
+            width: 100%;
+            height: 500px;
+  
+        }
+    </style>
+</head>
+<body>
+    <div class="bottom-bar">
+        <div class="bottom-bar-item" id="taskbar-main" onclick="restoreWindow('main-window')">Main Window</div>
+    </div>
+
+    <div class="window" id="main-window">
+        <div class="window-header" id="header-main">
+            <div class="dot red" onclick="closeWindow('main-window')"></div>
+            <div class="dot yellow" onclick="toggleMaximize('main-window')"></div>
+            <div class="dot green" onclick="minimizeWindow('main-window')"></div>
+        </div>
+        <div class="stacks-container">
+            <div class="stack-item" onclick="openGitHubWindow()">
+                <img src="./img/typescript.svg" alt="TypeScript" class="stack-icon">
+                <div class="stack-title">TypeScript</div>
+            </div>
+            <div class="stack-item">
+                <img src="./img/deno-pngrepo-com.png" alt="Deno" class="stack-icon">
+                <div class="stack-title">Deno</div>
+            </div>
+            <div class="stack-item">
+                <img src="./img/pngwing.com.png" alt="Python" class="stack-icon">
+                <div class="stack-title">Python</div>
+            </div>
+            <div class="stack-item" onclick="openGoWindow()">
+                <img src="./img/golang.png" alt="Go" class="stack-icon">
+                <div class="stack-title">Go</div>
+            </div>
+            <div class="stack-item">
+                <img src="./img/lua-svgrepo-com.svg" alt="Lua" class="stack-icon">
+                <div class="stack-title">Lua</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function makeDraggable(windowId) {
+            let win = document.getElementById(windowId);
+            let header = win.querySelector(".window-header");
+
+            let offsetX = 0, offsetY = 0, dragging = false;
+
+            header.addEventListener("mousedown", (e) => {
+                dragging = true;
+                offsetX = e.clientX - win.offsetLeft;
+                offsetY = e.clientY - win.offsetTop;
+
+                function move(e) {
+                    if (!dragging) return;
+                    requestAnimationFrame(() => {
+                        win.style.left = `${e.clientX - offsetX}px`;
+                        win.style.top = `${e.clientY - offsetY}px`;
+                    });
+                }
+
+                function stopDrag() {
+                    dragging = false;
+                    document.removeEventListener("mousemove", move);
+                    document.removeEventListener("mouseup", stopDrag);
+                }
+
+                document.addEventListener("mousemove", move);
+                document.addEventListener("mouseup", stopDrag);
+            });
+        }
+
+        function closeWindow(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function toggleMaximize(id) {
+            let win = document.getElementById(id);
+            if (win.style.width === '100vw') {
+                win.style.width = '900px';
+                win.style.height = 'auto';
+            } else {
+                win.style.width = '100vw';
+                win.style.height = '100vh';
+                win.style.left = '0';
+                win.style.top = '0';
+            }
+        }
+
+        function minimizeWindow(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function restoreWindow(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function openGitHubWindow() {
+            console.log("Opening GitHub window");
+            if (document.getElementById("github-window")) return;
+
+            let newWin = document.createElement("div");
+            newWin.classList.add("window");
+            newWin.id = "github-window";
+            newWin.innerHTML = `
+                <div class="window-header">
+                    <div class="dot red" onclick="closeWindow('github-window')"></div>
+                    <div class="dot yellow" onclick="toggleMaximize('github-window')"></div>
+                    <div class="dot green" onclick="minimizeWindow('github-window')"></div>
+                </div>
+                <iframe class="iframe-container" src="https://othersite.jyup.tokyo/jyup-escape?tab=repositories&q=&type=&language=javascript&sort="></iframe>
+            `;
+            document.body.appendChild(newWin);
+            makeDraggable("github-window");
+        }
+
+        function openGoWindow() {
+            console.log("Opening Go window");
+            if (document.getElementById("go-window")) return;
+
+            let newWin = document.createElement("div");
+            newWin.classList.add("window");
+            newWin.id = "go-window";
+            newWin.innerHTML = `
+                <div class="window-header">
+                    <div class="dot red" onclick="closeWindow('go-window')"></div>
+                    <div class="dot yellow" onclick="toggleMaximize('go-window')"></div>
+                    <div class="dot green" onclick="minimizeWindow('go-window')"></div>
+                </div>
+                <iframe class="iframe-container" src="https://othersite.jyup.tokyo/jyup-escape?tab=repositories&q=&type=&language=go&sort="></iframe>
+            `;
+            document.body.appendChild(newWin);
+
+            // Set window position to the center
+            newWin.style.position = "absolute";
+            newWin.style.left = "50%";
+            newWin.style.top = "50%";
+            newWin.style.transform = "translate(-50%, -50%)";
+            newWin.style.display = "flex";
+
+            console.log("Go window created");
+            makeDraggable("go-window");
+        }
+
+        makeDraggable("main-window");
+    </script>
+</body>
 </html>
