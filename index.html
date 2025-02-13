@@ -198,8 +198,12 @@
         }
 
         function closeWindow(id) {
-            document.getElementById(id).style.display = 'none';
+            let win = document.getElementById(id);
+            if (win) {
+            win.remove();  
+            }
         }
+        
 
         function toggleMaximize(id) {
             let win = document.getElementById(id);
@@ -219,7 +223,12 @@
         }
 
         function restoreWindow(id) {
-            document.getElementById(id).style.display = 'flex';
+            let win = document.getElementById(id);
+            if (win) {
+                win.style.display = 'flex';
+            }else{
+                openGitHubWindow();
+            }
         }
 
         function openGitHubWindow() {
