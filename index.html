@@ -277,7 +277,24 @@
             console.log("Go window created");
             makeDraggable("go-window");
         }
+        function openPythonWindow() {
+            console.log("Opening Python window");
+            if (document.getElementById("python-window")) return;
 
+            let newWin = document.createElement("div");
+            newWin.classList.add("window");
+            newWin.id = "python-window";
+            newWin.innerHTML = `
+                <div class="window-header">
+                    <div class="dot red" onclick="closeWindow('python-window')"></div>
+                    <div class="dot yellow" onclick="toggleMaximize('python-window')"></div>
+                    <div class="dot green" onclick="minimizeWindow('python-window')"></div>
+                </div>
+                <iframe class="iframe-container" src="https://othersite.jyup.tokyo/jyup-escape?tab=repositories&q=&type=&language=python&sort="></iframe>
+            `;
+            document.body.appendChild(newWin);
+            makeDraggable("python-window");
+        }
         makeDraggable("main-window");
     </script>
 </body>
