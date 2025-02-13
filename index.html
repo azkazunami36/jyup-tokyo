@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <meta name="description" content="じゅぴの自己紹介サイトです">
+    <meta name="keywords" content="じゅぴ,じゅぴの自己紹介,StealthEagle,じゅぴのポートフォリオ,じゅぴの作品,じゅぴのスキル,じゅぴの経歴">
+    <meta name="author" content="じゅぴ">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="じゅぴの自己紹介サイト">
+    <meta property="og:description" content="じゅぴの自己紹介サイトです">
+    <meta property="og:image" content="https://jyup.tokyo/img/icon.png">
+    <meta property="og:url" content="https://jyup.tokyo/">
+    <meta name="twitter:card" content="summary_large_image">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MacOS Style Window</title>
+    <title>じゅぴの自己紹介ページ</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -151,7 +161,7 @@
                 <img src="./img/deno-pngrepo-com.png" alt="Deno" class="stack-icon">
                 <div class="stack-title">Deno</div>
             </div>
-            <div class="stack-item" onclick="openPythonWindow()">
+            <div class="stack-item">
                 <img src="./img/pngwing.com.png" alt="Python" class="stack-icon">
                 <div class="stack-title">Python</div>
             </div>
@@ -277,24 +287,7 @@
             console.log("Go window created");
             makeDraggable("go-window");
         }
-        function openPythonWindow() {
-            console.log("Opening Python window");
-            if (document.getElementById("python-window")) return;
 
-            let newWin = document.createElement("div");
-            newWin.classList.add("window");
-            newWin.id = "python-window";
-            newWin.innerHTML = `
-                <div class="window-header">
-                    <div class="dot red" onclick="closeWindow('python-window')"></div>
-                    <div class="dot yellow" onclick="toggleMaximize('python-window')"></div>
-                    <div class="dot green" onclick="minimizeWindow('python-window')"></div>
-                </div>
-                <iframe class="iframe-container" src="https://othersite.jyup.tokyo/jyup-escape?tab=repositories&q=&type=&language=python&sort="></iframe>
-            `;
-            document.body.appendChild(newWin);
-            makeDraggable("python-window");
-        }
         makeDraggable("main-window");
     </script>
 </body>
