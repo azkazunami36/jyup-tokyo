@@ -229,10 +229,9 @@
         function closeWindow(id) {
             let win = document.getElementById(id);
             if (win) {
-            win.remove();  
+                win.remove();  
             }
         }
-        
 
         function toggleMaximize(id) {
             let win = document.getElementById(id);
@@ -255,7 +254,7 @@
             let win = document.getElementById(id);
             if (win) {
                 win.style.display = 'flex';
-            }else{
+            } else {
                 openGitHubWindow();
             }
         }
@@ -308,6 +307,23 @@
         }
 
         makeDraggable("main-window");
+
+        let newWin = document.createElement("div");
+        newWin.classList.add("window");
+        newWin.id = "hello-world-window";
+        newWin.innerHTML = `
+            <div class="window-header">
+                <div class="dot red" onclick="closeWindow('hello-world-window')"></div>
+                <div class="dot yellow" onclick="toggleMaximize('hello-world-window')"></div>
+                <div class="dot green" onclick="minimizeWindow('hello-world-window')"></div>
+            </div>
+            <div class="hello-world">Hello World</div>
+        `;
+        document.body.appendChild(newWin);
+
+        // ウィンドウの追加後にmakeDraggableを呼び出す
+        makeDraggable("hello-world-window");
+
     </script>
 </body>
 </html>
